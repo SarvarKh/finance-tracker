@@ -9,21 +9,22 @@ class UsersController < ApplicationController
 
   def search
     if params[:friend].present?
-      @stock = Stock.new_lookup(params[:friend])
-      if @friend
-        respond_to do |f|
-          f.js { render partial: 'users/friend_result'}
+      @friends = User.search(params[:friend])
+      @friends = current_user.except_current_user(@friends)
+      if @friends
+        respond_to do |format|
+          format.js { render partial: 'users/friend_result' }
         end
       else
-        respond_to do |f|
+        respond_to do |format|
           flash.now[:alert] = "Couldn't find user"
-          f.js { render partial: 'users/friend_result' }
+          format.js { render partial: 'users/friend_result' }
         end
-      end
+      end    
     else
-      respond_to do |f|
+      respond_to do |format|
         flash.now[:alert] = "Please enter a friend name or email to search"
-        f.js { render partial: 'users/friend_result' }
+        format.js { render partial: 'users/friend_result' }
       end
     end
   end
